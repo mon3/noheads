@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">noheads</string>
+    <string name="enter_artist">Enter artist</string>
+    <string name="add_song">Add Song</string>
+    <string name="enter_song">Enter song</string>
+    <array name="languages">
+        <item>Polish</item>
+        <item>English</item>
+    </array>
 </resources>
