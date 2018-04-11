@@ -3,6 +3,7 @@
     <string name="enter_artist">Enter artist</string>
     <string name="add_song">Add Song</string>
     <string name="enter_song">Enter song</string>
+    <string name="textview">TextView</string>
     <array name="languages">
         <item>Polish</item>
         <item>English</item>
