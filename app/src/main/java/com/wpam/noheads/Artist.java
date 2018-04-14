@@ -16,6 +16,14 @@ public class Artist {
     public Artist(String artistId, String artistName) {
         this.artistId = artistId;
         this.artistName = artistName;
+//        TODO: add songs to Artist
+    }
+
+
+    public Artist(String artistId, String artistName, String songTitle, String language) {
+        this.artistId = artistId;
+        this.artistName = artistName;
+        Song song = new Song(songTitle, language);
     }
 
     public String getArtistId() {

@@ -11,9 +11,11 @@ public class Song {
     String language;
 //    ToDO: add artist FK; move language to separate db table
 
+//    Important to be able to retrieve the values
     public Song(){
 
     }
+
 
     public Song(String songId, String songTitle, String language) {
         this.songId = songId;
@@ -25,7 +27,6 @@ public class Song {
         this.songId = songId;
         this.songTitle = songTitle;
     }
-
     public String getSongId() {
         return songId;
     }
