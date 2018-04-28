@@ -19,7 +19,6 @@ public class Artist {
     public Artist(String artistId, String artistName) {
         this.artistId = artistId;
         this.artistName = artistName;
-//        TODO: add songs to Artist
     }
 
 

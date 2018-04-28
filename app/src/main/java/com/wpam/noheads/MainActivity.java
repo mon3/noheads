@@ -1,7 +1,6 @@
 package com.wpam.noheads;
 
 import android.content.Context;
-import android.database.DatabaseUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -17,7 +16,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -39,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     Map<String, String> artistsMap = new HashMap<>();
-    Map<String, ArrayList<String>> songsMap = new HashMap<>();
+    Map<String, ArrayList<String>> songsMap = new HashMap<>(); // key = artistID, songsMap = list of songs
 
 
     @Override
@@ -65,8 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 String artistId = artist.getArtistId();
 
                 artistsMap.put(artistName, artistId);
-                Log.v("Artist NAME: ", artistName);
-                Log.v("Artist ID: ", artistId);
+                Log.v("ARTISTS DB", "onChildAdded: " + artistName);
 
             }
 
@@ -78,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Artist artist = dataSnapshot.getValue(Artist.class);
-                artistsMap.remove(artist);
+                String removedArtist = artist.getArtistName();
+                Log.v("ARTISTS DB", "onChildRemoved: " + removedArtist);
+                artistsMap.remove(removedArtist);
             }
 
             @Override
@@ -93,25 +92,29 @@ public class MainActivity extends AppCompatActivity {
         });
 
         databaseSongs.addChildEventListener(new ChildEventListener() {
+
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Song song = dataSnapshot.getValue(Song.class);
-                String songTitle = song.getSongTitle();
-                String artistId = dataSnapshot.getKey(); // parent ID = artist ID
 
-                if (songsMap.containsKey(songTitle)){
-                    Log.v("database songs: ", "contains songTitle!");
-                    ArrayList<String> songs = songsMap.get(songTitle);
-                    songs.add(songTitle);
+                String songArtistId = dataSnapshot.getKey();
+                Log.e("SONGS DB" ,"Artist's songs number: " + dataSnapshot.getChildrenCount());
+
+                for (DataSnapshot songSnapshot: dataSnapshot.getChildren()) {
+                    Song song = songSnapshot.getValue(Song.class);
+                    String songTitle =  song.getSongTitle();
+                    Log.d("SONGS DB",songTitle );
+
+                    if (songsMap.containsKey(songArtistId)){
+                        ArrayList<String> songsList = songsMap.get(songArtistId);
+                        songsList.add(songTitle);
+                    }
+                    else {
+                        ArrayList<String> songs = new ArrayList<>();
+                        songs.add(songTitle);
+                        songsMap.put(songArtistId, songs);
+                        Log.v("SONGS DB", "New song: " + songTitle);
+                    }
                 }
-                else {
-                    Log.v("database songs: ", "cnew song");
-                    ArrayList<String> songs = new ArrayList<String>();
-                    songs.add(songTitle);
-                    songsMap.put(artistId, songs);
-                }
-//                Log.v("SONG TITLE: ", songTitle);
-//                Log.v("SONG Artist ID: ", artistId);
             }
 
             @Override
@@ -121,9 +124,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Song song = dataSnapshot.getValue(Song.class);
-//                String songTitle = song.getSongTitle();
-                songsMap.remove(song);
+                String songArtistId = dataSnapshot.getKey();
+                Log.e("SONGS DB" ,"Song list removed" + songArtistId);
+
             }
 
             @Override
@@ -150,8 +153,6 @@ public class MainActivity extends AppCompatActivity {
             final String artistName = editTextArtist.getText().toString().trim();
             final String songTitle = editTextSong.getText().toString().trim();
             final String language = spinnerLanguages.getSelectedItem().toString();
-            Log.v("Language selected: ", language);
-            Log.v("To add song: ", songTitle);
 
             if(!TextUtils.isEmpty(artistName) && !TextUtils.isEmpty(songTitle)){
 
@@ -172,6 +173,7 @@ public class MainActivity extends AppCompatActivity {
                                     if (artistSongs.contains(songTitle))
                                     {
                                         Log.d("Song exists: ", songTitle);
+                                        Toast.makeText(mContext, "Song already exists!", Toast.LENGTH_LONG).show();
                                     }
                                     else {
                                         Log.d("New song: ", songTitle);
@@ -181,33 +183,16 @@ public class MainActivity extends AppCompatActivity {
 
 
                                 else {
-                                    databaseSongs = databaseSongs.child(existingArtistId);
-                                    String songId = databaseSongs.push().getKey();
-                                    Song song = new Song(songTitle, language);
-                                    databaseSongs.child(songId).setValue(song);
-                                    Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
-                                    Log.v("Song addition: ", "Song added in else!!!");
+                                      addNewSongForArtist (existingArtistId, songTitle, language);
                                 }
-
-                                DatabaseUtil.findSongByArtistId(existingArtistId, songTitle, new DatabaseUtil.Listener() {
-                                    @Override
-                                    public void onSongRetrieved(Song song) {
-                                        Log.v("Song from UTIL: ", song.getSongTitle());
-                                    }
-                                });
-
-//                                DatabaseReference artistSongsRef = databaseSongs.child(existingArtistId).getRef().orderByChild("songTitle").equalTo(songTitle);
-//                                artistSongsRef.addChildEventListener(ChildEventListener childListener)
-//                                Query artistSongSnap = databaseSongs.child(existingArtistId).orderByKey();
-//                                Log.v("Children: ", artistSongSnap.toString());
 
 
 //                                for (DataSnapshot song: databaseSongs.child(existingArtistId).)
 
-                                Log.v("Existing artidst ID: ", existingArtistId);
-                                Log.v("MainActivity", "Artist exists!");
-                                Toast.makeText(mContext, "Artist already exists!", Toast.LENGTH_LONG).show();
-                                break;
+//                                Log.v("Existing artist ID: ", existingArtistId);
+//                                Log.v("MainActivity", "Artist exists!");
+//                                Toast.makeText(mContext, "Artist already exists!", Toast.LENGTH_LONG).show();
+//                                break;
 
                             }
                         }
@@ -220,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
                             databaseSongs = databaseSongs.child(artistId);
                             String songId = databaseSongs.push().getKey();
-                            Song song = new Song(songTitle, language);
+                            Song song = new Song(artistId, songTitle, language);
 
 //                            databaseSongs.setValue(song);
                             databaseSongs.child(songId).setValue(song);
@@ -234,7 +219,6 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Log.e("Firebase", databaseError.getMessage());
-                        Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
                     }
                 });
 //                databaseArtists.child(artistId).setValue(artist);
@@ -249,18 +233,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void addNewSongForArtist (String artistId, String songTitle, String language) {
 
-//        ToDO: add song to firebase if not exists
         DatabaseReference newSongRef = FirebaseDatabase.getInstance().getReference("songs").child(artistId);
+
         String songId = newSongRef.push().getKey();
-        Song song = new Song(songTitle, language);
+        Song song = new Song(artistId, songTitle, language);
         newSongRef.child(songId).setValue(song);
-    }
-
-    private void readArtists () {
-//      ToDO: read artists and songs into the hashmap only once
-
+        Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
     }
 
 
-    }
+ }
 

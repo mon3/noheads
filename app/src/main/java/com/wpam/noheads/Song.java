@@ -1,5 +1,8 @@
 package com.wpam.noheads;
 
+import android.support.v4.util.Pair;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,9 +12,11 @@ import java.util.Map;
 
 public class Song {
 
+//    String artistId;
     String songId;
     String songTitle;
     String language;
+//    ArrayList<Pair<String,String>> songList;
 
 
 
@@ -24,12 +29,14 @@ public class Song {
         this.songId = songId;
         this.songTitle = songTitle;
         this.language = language;
+
     }
 
     public Song(String songTitle, String language) {
         this.language = language;
         this.songTitle = songTitle;
     }
+
     public String getSongId() {
         return songId;
     }
@@ -55,6 +62,7 @@ public class Song {
     }
 
 
+//    ToDO: modify function!!!
     public Map<String, Object> toMap() {
 //        Addition on new artist to the map of artists already existing in the database
         HashMap<String, Object> resultSongMap = new HashMap<>();
