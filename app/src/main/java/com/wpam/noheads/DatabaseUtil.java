@@ -18,6 +18,7 @@ public class DatabaseUtil{
         FirebaseDatabase.getInstance().getReference("songs").child(artistId).orderByChild("songTitle").equalTo(newSong).limitToFirst(1).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.v("UTIL: ", "inside");
                 Song song = dataSnapshot.getValue(Song.class);
                 Log.v("Song inside: ", song.getSongTitle());
                 listener.onSongRetrieved(song);

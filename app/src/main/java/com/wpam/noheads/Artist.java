@@ -1,5 +1,8 @@
 package com.wpam.noheads;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by monikas on 07.04.18.
  */
@@ -10,7 +13,7 @@ public class Artist {
     String artistName;
 
     public Artist(){
-
+//        Default constructor required for calls to DataSnapshot.getvValue(Artist.class);
     }
 
     public Artist(String artistId, String artistName) {
@@ -41,4 +44,13 @@ public class Artist {
     public void setArtistName(String artistName) {
         this.artistName = artistName;
     }
+
+    public Map<String, Object> toMap() {
+//        Addition on new artist to the map of artists already existing in the database
+        HashMap<String, Object> resultArtistMap = new HashMap<>();
+        resultArtistMap.put("artistId", artistId);
+        resultArtistMap.put("artistName", artistName);
+        return resultArtistMap;
+    }
+
 }

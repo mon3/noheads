@@ -1,5 +1,8 @@
 package com.wpam.noheads;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by monikas on 07.04.18.
  */
@@ -9,11 +12,11 @@ public class Song {
     String songId;
     String songTitle;
     String language;
-//    ToDO: add artist FK; move language to separate db table
 
-//    Important to be able to retrieve the values
+
+
     public Song(){
-
+//    Important to be able to retrieve the object in DatabaseReference using Song.getClass
     }
 
 
@@ -23,8 +26,8 @@ public class Song {
         this.language = language;
     }
 
-    public Song(String songId, String songTitle) {
-        this.songId = songId;
+    public Song(String songTitle, String language) {
+        this.language = language;
         this.songTitle = songTitle;
     }
     public String getSongId() {
@@ -50,4 +53,15 @@ public class Song {
     public void setLanguage(String language) {
         this.language = language;
     }
+
+
+    public Map<String, Object> toMap() {
+//        Addition on new artist to the map of artists already existing in the database
+        HashMap<String, Object> resultSongMap = new HashMap<>();
+        resultSongMap.put("songId", songId);
+        resultSongMap.put("songTitle", songTitle);
+        resultSongMap.put("language", language);
+        return resultSongMap;
+    }
+
 }

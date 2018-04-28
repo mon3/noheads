@@ -20,6 +20,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -36,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     Context mContext;
 
 
-//    Map vill be used to store values
+    Map<String, String> artistsMap = new HashMap<>();
+    Map<String, ArrayList<String>> songsMap = new HashMap<>();
 
 
     @Override
@@ -53,42 +56,86 @@ public class MainActivity extends AppCompatActivity {
         buttonAdd = findViewById(R.id.buttonAddSong);
         spinnerLanguages = findViewById(R.id.spinnerLanguages);
 
-//        databaseArtists.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Map<String, String> map = (Map<String, String>)dataSnapshot.getValue();
-////                 need to extract values
-//                String artistId = map.get("artistId");
-//                String artistName = map.get("artistName");
-//                Log.v("Artist Id", artistId);
-//                Log.v("Artist name", artistName);
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
 
+        databaseArtists.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Artist artist = dataSnapshot.getValue(Artist.class);
+                String artistName = artist.getArtistName();
+                String artistId = artist.getArtistId();
 
-//        databaseSongs.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                Map<String, String> map = (Map<String, String>)dataSnapshot.getValue();
-////                 need to extract values
-//                String songId = map.get("songId");
-//                String songTitle = map.get("songTitle");
-//                Log.v("song Id", songId);
-//                Log.v("Song title", songTitle);
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
+                artistsMap.put(artistName, artistId);
+                Log.v("Artist NAME: ", artistName);
+                Log.v("Artist ID: ", artistId);
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Artist artist = dataSnapshot.getValue(Artist.class);
+                artistsMap.remove(artist);
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        databaseSongs.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Song song = dataSnapshot.getValue(Song.class);
+                String songTitle = song.getSongTitle();
+                String artistId = dataSnapshot.getKey(); // parent ID = artist ID
+
+                if (songsMap.containsKey(songTitle)){
+                    Log.v("database songs: ", "contains songTitle!");
+                    ArrayList<String> songs = songsMap.get(songTitle);
+                    songs.add(songTitle);
+                }
+                else {
+                    Log.v("database songs: ", "cnew song");
+                    ArrayList<String> songs = new ArrayList<String>();
+                    songs.add(songTitle);
+                    songsMap.put(artistId, songs);
+                }
+//                Log.v("SONG TITLE: ", songTitle);
+//                Log.v("SONG Artist ID: ", artistId);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Song song = dataSnapshot.getValue(Song.class);
+//                String songTitle = song.getSongTitle();
+                songsMap.remove(song);
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
         buttonAdd.setOnClickListener(new View.OnClickListener() {
@@ -104,13 +151,9 @@ public class MainActivity extends AppCompatActivity {
             final String songTitle = editTextSong.getText().toString().trim();
             final String language = spinnerLanguages.getSelectedItem().toString();
             Log.v("Language selected: ", language);
+            Log.v("To add song: ", songTitle);
 
             if(!TextUtils.isEmpty(artistName) && !TextUtils.isEmpty(songTitle)){
-
-                String songId = databaseSongs.push().getKey();
-//                final String artistId = databaseArtists.push().getKey();
-
-//                Song song = new Song(songId, songTitle, language);
 
                 databaseArtists.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -122,6 +165,29 @@ public class MainActivity extends AppCompatActivity {
                             if (dbArtist.equals(artistName)) {
                                 artistExists = true;
                                 String existingArtistId = data.child("artistId").getValue().toString();
+                                Log.v("DB ARTIST: ", dbArtist);
+                                if (songsMap.containsKey(existingArtistId))
+                                {
+                                    ArrayList<String> artistSongs = songsMap.get(existingArtistId);
+                                    if (artistSongs.contains(songTitle))
+                                    {
+                                        Log.d("Song exists: ", songTitle);
+                                    }
+                                    else {
+                                        Log.d("New song: ", songTitle);
+                                        addNewSongForArtist(existingArtistId, songTitle, language);
+                                    }
+                                }
+
+
+                                else {
+                                    databaseSongs = databaseSongs.child(existingArtistId);
+                                    String songId = databaseSongs.push().getKey();
+                                    Song song = new Song(songTitle, language);
+                                    databaseSongs.child(songId).setValue(song);
+                                    Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
+                                    Log.v("Song addition: ", "Song added in else!!!");
+                                }
 
                                 DatabaseUtil.findSongByArtistId(existingArtistId, songTitle, new DatabaseUtil.Listener() {
                                     @Override
@@ -147,14 +213,18 @@ public class MainActivity extends AppCompatActivity {
                         }
                         if (!artistExists){
                             String artistId = databaseArtists.push().getKey();
-                            databaseSongs = databaseSongs.child(artistId);
-                            String songId = databaseSongs.push().getKey();
-                            Song song = new Song(songId, songTitle, language);
 
-                            databaseSongs.setValue(song);
                             Artist artist = new Artist(artistId, artistName);
                             DatabaseReference newArtistRef = databaseArtists.push();
                             newArtistRef.setValue(artist);
+
+                            databaseSongs = databaseSongs.child(artistId);
+                            String songId = databaseSongs.push().getKey();
+                            Song song = new Song(songTitle, language);
+
+//                            databaseSongs.setValue(song);
+                            databaseSongs.child(songId).setValue(song);
+
 
                             Log.v("MainActivity", "New artist will be added");
                             Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
@@ -174,6 +244,21 @@ public class MainActivity extends AppCompatActivity {
             else {
                 Toast.makeText(this, "Please enter proper data", Toast.LENGTH_LONG).show();
             }
+    }
+
+
+    private void addNewSongForArtist (String artistId, String songTitle, String language) {
+
+//        ToDO: add song to firebase if not exists
+        DatabaseReference newSongRef = FirebaseDatabase.getInstance().getReference("songs").child(artistId);
+        String songId = newSongRef.push().getKey();
+        Song song = new Song(songTitle, language);
+        newSongRef.child(songId).setValue(song);
+    }
+
+    private void readArtists () {
+//      ToDO: read artists and songs into the hashmap only once
+
     }
 
 
