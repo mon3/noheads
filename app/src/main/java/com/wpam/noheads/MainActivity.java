@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity {
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.v("BUTTON: ", "button clicked");
                 addSongArtist();
             }
         });
@@ -155,64 +156,45 @@ public class MainActivity extends AppCompatActivity {
             final String language = spinnerLanguages.getSelectedItem().toString();
 
             if(!TextUtils.isEmpty(artistName) && !TextUtils.isEmpty(songTitle)){
-
+                Log.v("BUTTON: ", "before event listener");
                 databaseArtists.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         boolean artistExists = false;
-                        for (DataSnapshot data: dataSnapshot.getChildren()) {
-                            String dbArtist = (String)data.child("artistName").getValue();
+                        Log.v("BUTTON: ", "inside ddatabase artists event listener");
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            String dbArtist = (String) data.child("artistName").getValue();
                             Log.v("Data: ", dbArtist);
                             if (dbArtist.equals(artistName)) {
                                 artistExists = true;
                                 String existingArtistId = data.child("artistId").getValue().toString();
                                 Log.v("DB ARTIST: ", dbArtist);
-                                if (songsMap.containsKey(existingArtistId))
-                                {
+                                if (songsMap.containsKey(existingArtistId)) {
                                     ArrayList<String> artistSongs = songsMap.get(existingArtistId);
-                                    if (artistSongs.contains(songTitle))
-                                    {
+                                    if (artistSongs.contains(songTitle)) {
                                         Log.d("Song exists: ", songTitle);
                                         Toast.makeText(mContext, "Song already exists!", Toast.LENGTH_LONG).show();
-                                    }
-                                    else {
+                                    } else {
+                                        Log.v("ARTIST: ", "Artist - yes, song - no");
                                         Log.d("New song: ", songTitle);
                                         addNewSongForArtist(existingArtistId, songTitle, language);
                                     }
                                 }
 
-
-                                else {
-                                      addNewSongForArtist (existingArtistId, songTitle, language);
-                                }
-
-
-//                                for (DataSnapshot song: databaseSongs.child(existingArtistId).)
-
-//                                Log.v("Existing artist ID: ", existingArtistId);
-//                                Log.v("MainActivity", "Artist exists!");
-//                                Toast.makeText(mContext, "Artist already exists!", Toast.LENGTH_LONG).show();
-//                                break;
-
                             }
+
+
                         }
-                        if (!artistExists){
+
+                         if(artistExists == false) {
+                            Log.v("ARTIST: ", "!artist Exists");
                             String artistId = databaseArtists.push().getKey();
 
                             Artist artist = new Artist(artistId, artistName);
                             DatabaseReference newArtistRef = databaseArtists.push();
                             newArtistRef.setValue(artist);
 
-                            databaseSongs = databaseSongs.child(artistId);
-                            String songId = databaseSongs.push().getKey();
-                            Song song = new Song(artistId, songTitle, language);
-
-//                            databaseSongs.setValue(song);
-                            databaseSongs.child(songId).setValue(song);
-
-
-                            Log.v("MainActivity", "New artist will be added");
-                            Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
+                            addNewSongForArtist(artistId, songTitle, language);
                         }
                     }
 
@@ -221,9 +203,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e("Firebase", databaseError.getMessage());
                     }
                 });
-//                databaseArtists.child(artistId).setValue(artist);
-//                databaseSongs.child(songId).setValue(song);
-//
+
             }
             else {
                 Toast.makeText(this, "Please enter proper data", Toast.LENGTH_LONG).show();
@@ -236,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference newSongRef = FirebaseDatabase.getInstance().getReference("songs").child(artistId);
 
         String songId = newSongRef.push().getKey();
-        Song song = new Song(artistId, songTitle, language);
+        Song song = new Song(songTitle, language);
         newSongRef.child(songId).setValue(song);
         Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
     }
