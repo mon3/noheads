@@ -1,6 +1,7 @@
 package com.wpam.noheads;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -51,7 +52,9 @@ public class AddSongActivity extends AppCompatActivity {
         editTextSong = findViewById(R.id.editTextSong);
         buttonAdd = findViewById(R.id.buttonAddSong);
         spinnerLanguages = findViewById(R.id.spinnerLanguages);
-
+        Intent intent = getIntent();
+//        artistsMap = (HashMap<String, String>)intent.getSerializableExtra("artistsData");
+//        songsMap = (Map<String, ArrayList<String>>)intent.getSerializableExtra("songsData");
 
         databaseArtists.addChildEventListener(new ChildEventListener() {
             @Override
