@@ -1,4 +1,4 @@
-package com.wpam.noheads;
+package com.wpam.noheads.Model;
 
 import android.support.v4.util.Pair;
 

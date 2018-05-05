@@ -1,4 +1,6 @@
-package com.wpam.noheads;
+package com.wpam.noheads.Model;
+
+import com.wpam.noheads.Model.Song;
 
 import java.util.ArrayList;
 
