@@ -35,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     Map<String, String> artistsMap = new HashMap<>();
     Map<String, ArrayList<String>> songsMap = new HashMap<>(); // key = artistID, songsMap = list of songs
 
+//    private ActivityMainBinding binding;
+    private String withId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,20 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
         setContentView(R.layout.activity_main);
         buttonAdd = findViewById(R.id.buttonAddDb);
+
+//        Bundle extras = getIntent().getExtras();
+////        String type = extras.getString("type");
+////        if (type.equals("com.wpam.noheads.wifi")) {
+//            withId = extras.getString("withId");
+////            binding.canvas.setWifiWith(withId);
+//            String gameId = extras.getString("gameId");
+////            binding.canvas.setGameId(gameId);
+////            binding.canvas.setMe(extras.getString("me"));
+//
+//            FirebaseDatabase.getInstance().getReference().child("games")
+//                    .child(gameId)
+//                    .setValue(null);
+
 
 //        databaseArtists = FirebaseDatabase.getInstance().getReference("artists");
 ////        fetchArtists();
@@ -80,7 +97,8 @@ public class MainActivity extends AppCompatActivity {
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent addSongIntent = new Intent(mContext, AddSongActivity.class);
+//                Intent addSongIntent = new Intent(mContext, AddSongActivity.class);
+                Intent addSongIntent = new Intent(mContext, LoginActivity.class);
 //                addSongIntent.putExtra("artistsData", (Serializable) artistsMap);
 //                addSongIntent.putExtra("songsData", (Serializable) songsMap);
                 Log.v("BUTTON: ", "button clicked");

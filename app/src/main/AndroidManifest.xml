@@ -30,11 +30,33 @@
             </intent-filter>
         </activity>
         <activity android:name=".AddSongActivity">
-                android:parentActivityName=".MainActivity">
+
                 <!-- The meta-data tag is required if you support API level 15 and lower -->
                 <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value=".MainActivity" />
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".wifi.UserListActivity">
+
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LoginActivity" />
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".LoginActivity">
+
+            <!-- The meta-data tag is required if you support API level 15 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -51,6 +73,9 @@
             <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
         </intent-filter>
         </service>
+
+
+        <receiver android:name=".Push_notifications.NotificationReceiver"/>
     </application>
 
 </manifest>

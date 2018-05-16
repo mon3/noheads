@@ -14,9 +14,8 @@ import static com.wpam.noheads.Util.savePushToken;
  */
 
 public class FirebaseIDService extends FirebaseInstanceIdService {
-    private static final String TAG = "FirebaseIDService";
+    private static final String LOG_TAG = "FirebaseIDService";
 
-    private static final String LOG_TAG = "MyFirebaseInstanceId";
     @Override
     public void onTokenRefresh() {
         Log.d(LOG_TAG, "onTokenRefresh: ");
