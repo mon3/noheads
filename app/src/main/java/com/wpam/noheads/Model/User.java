@@ -5,13 +5,19 @@ package com.wpam.noheads.Model;
  */
 
 public class User {
-    private String name, pushId;
+    private String name, pushId, userId;
 
     public User() {
     }
 
     public User(String name) {
         this.name = name;
+    }
+
+    public User(String userId, String name, String pushId) {
+        this.userId = userId;
+        this.name = name;
+        this.pushId = pushId;
     }
 
     public String getName() {
@@ -22,11 +28,17 @@ public class User {
         this.name = name;
     }
 
+    public void setUserId(String userId) {this.userId = userId;}
+
     public String getPushId() {
         return pushId;
     }
 
+
+
     public void setPushId(String pushId) {
         this.pushId = pushId;
     }
+
+
 }

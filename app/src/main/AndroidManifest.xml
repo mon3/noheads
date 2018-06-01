@@ -62,6 +62,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".StartGameActivity" />
+        <activity android:name=".NewGameActivity" />
 
         <service android:name=".Push_notifications.FirebaseMessaging">
         <intent-filter>

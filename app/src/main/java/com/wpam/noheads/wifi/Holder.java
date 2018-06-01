@@ -28,6 +28,8 @@ import static com.wpam.noheads.Util.getCurrentUserId;
 public class Holder extends RecyclerView.ViewHolder {
     public UserListItemBinding binding;
     public static final String FIREBASE_CLOUD_FUNCTIONS_BASE = "https://us-central1-noheads-7fa10.cloudfunctions.net";
+    private static final String LOG_TAG = "FirebaseIDService";
+
 
     public Holder(View itemView) {
         super(itemView);
@@ -43,13 +45,18 @@ public class Holder extends RecyclerView.ViewHolder {
 
                             OkHttpClient client = new OkHttpClient();
 
-                            String to = binding.getUser().getPushId();
+                            String to = binding.getUser().getName();
+                            String toPushId = UserListActivity.usersMap.get(to);
+                            Log.i(LOG_TAG, "message to: " + to);
+                            Log.i(LOG_TAG, "message toPushID: " + toPushId);
+
+                            Log.i(LOG_TAG, "message from: " +me.getPushId() + " " +  getCurrentUserId());
 
                             Request request = new Request.Builder()
                                     .url(String
                                             .format("%s/sendNotification?to=%s&fromPushId=%s&fromId=%s&fromName=%s&type=%s",
                                                     FIREBASE_CLOUD_FUNCTIONS_BASE,
-                                                    to,
+                                                    toPushId,
                                                     me.getPushId(),
                                                     getCurrentUserId(),
                                                     me.getName(),

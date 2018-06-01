@@ -18,6 +18,8 @@
     <string name="multiplayer_mode">Multiplayer</string>
     <string name="name_hint">Name</string>
     <string name="invitePlay">Invite to play</string>
+    <string name="new_song">Add new song</string>
+    <string name="Login">Login</string>
     <array name="languages">
         <item>Polish</item>
         <item>English</item>

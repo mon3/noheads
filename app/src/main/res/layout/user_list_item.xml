@@ -23,6 +23,9 @@
                 android:layout_gravity="center_vertical"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                 tools:text="Name"
+                android:fontFamily="casual"
+                android:textColor="@color/logoColor"
+                android:textStyle="bold"
                 android:layout_marginLeft="@dimen/activity_horizontal_margin" />
 
             <Button
@@ -31,6 +34,9 @@
                 android:id="@+id/invite"
                 style="@style/Widget.AppCompat.Button.Borderless.Colored"
                 android:layout_gravity="end|center_vertical"
+                android:fontFamily="casual"
+                android:textStyle="bold"
+                android:textColor="@color/blackColor"
                 android:layout_height="wrap_content" />
         </FrameLayout>
     </layout>

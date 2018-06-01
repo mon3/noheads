@@ -16,12 +16,16 @@ import com.wpam.noheads.Util;
 import com.wpam.noheads.databinding.ActivityUserListBinding;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class UserListActivity extends AppCompatActivity {
     private static final String LOG_TAG = "UserListActivity";
     private List<User> users = new ArrayList<>();
+    static Map<String, String> usersMap = new HashMap<>(); //key - value
+
     private Adapter adapter;
 
     @Override
@@ -45,6 +49,8 @@ public class UserListActivity extends AppCompatActivity {
                             User user = snapshot.getValue(User.class);
                             if (!snapshot.getKey().equals(Util.getCurrentUserId())) {
                                 users.add(user);
+                                String dbUserId = snapshot.getKey();
+                                usersMap.put(user.getName(), user.getPushId());
                             }
                         }
 

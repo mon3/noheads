@@ -16,6 +16,7 @@ public class Song {
     String songId;
     String songTitle;
     String language;
+    String songArtistId;
 //    ArrayList<Pair<String,String>> songList;
 
 
@@ -29,7 +30,13 @@ public class Song {
         this.songId = songId;
         this.songTitle = songTitle;
         this.language = language;
+    }
 
+    public Song(String songArtistId, String songId, String songTitle, String language) {
+        this.songArtistId = songArtistId;
+        this.songId = songId;
+        this.songTitle = songTitle;
+        this.language = language;
     }
 
     public Song(String songTitle, String language) {
@@ -60,6 +67,8 @@ public class Song {
     public void setLanguage(String language) {
         this.language = language;
     }
+    public void setSongArtistId(String songArtistId) {this.songArtistId = songArtistId;}
+    public String getSongArtistId() {return  songArtistId;}
 
 
 //    ToDO: modify function!!!

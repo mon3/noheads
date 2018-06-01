@@ -105,7 +105,7 @@ public class AddSongActivity extends AppCompatActivity {
                 for (DataSnapshot songSnapshot: dataSnapshot.getChildren()) {
                     Song song = songSnapshot.getValue(Song.class);
                     String songTitle =  song.getSongTitle();
-                    Log.d("SONGS DB",songTitle );
+                    Log.d("SONGS DB", "songTitle: " + songTitle );
 
                     if (songsMap.containsKey(songArtistId)){
                         ArrayList<String> songsList = songsMap.get(songArtistId);

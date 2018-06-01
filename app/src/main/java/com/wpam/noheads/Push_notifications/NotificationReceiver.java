@@ -3,6 +3,7 @@ package com.wpam.noheads.Push_notifications;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.Time;
 import android.util.Log;
 
 import com.google.firebase.database.DataSnapshot;
@@ -11,8 +12,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.wpam.noheads.MainActivity;
 import com.wpam.noheads.Model.User;
+import com.wpam.noheads.NewGameActivity;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -40,7 +45,8 @@ public class NotificationReceiver  extends BroadcastReceiver {
 
                             String to = intent.getExtras().getString("to");
                             String withId = intent.getExtras().getString("withId");
-
+                            Log.d(LOG_TAG, to);
+                            Log.d(LOG_TAG, intent.getAction().toString());
                             String format = String
                                     .format("%s/sendNotification?to=%s&fromPushId=%s&fromId=%s&fromName=%s&type=%s",
                                             FIREBASE_CLOUD_FUNCTIONS_BASE,
@@ -69,15 +75,20 @@ public class NotificationReceiver  extends BroadcastReceiver {
 
                             if (intent.getAction().equals("accept")) {
                                 String gameId = withId + "-" + getCurrentUserId();
+                                Time today = new Time(Time.getCurrentTimezone());
+                                today.setToNow();
                                 FirebaseDatabase.getInstance().getReference().child("games")
-                                        .child(gameId)
-                                        .setValue(null);
+                                        .child(gameId).child("restart")
+                                        .setValue(today.format("%k_%M_%S"));
 
-                                context.startActivity(new Intent(context, MainActivity.class)
+                                Intent newGameIntent = new Intent(context, NewGameActivity.class)
                                         .putExtra("type", "wifi")
-                                        .putExtra("me", "o")
+                                        .putExtra("me", "1")
                                         .putExtra("gameId", gameId)
-                                        .putExtra("with", withId));
+                                        .putExtra("withId", withId);
+                                newGameIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                                context.startActivity(newGameIntent);
+
                             }
                         }
 

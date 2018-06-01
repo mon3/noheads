@@ -3,4 +3,9 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="logoColor">#573976</color>
+    <color name="buttonColor">#d2c2c2</color>
+    <color name="blackColor">#000000</color>
+    <color name="loginBackgroundColor">#dfdfe6</color>
+
 </resources>

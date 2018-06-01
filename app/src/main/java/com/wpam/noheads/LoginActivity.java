@@ -1,7 +1,9 @@
 package com.wpam.noheads;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,6 +26,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.wpam.noheads.Model.User;
 
 
+import com.wpam.noheads.Push_notifications.FirebaseIDService;
 import com.wpam.noheads.wifi.UserListActivity;
 
 import static android.text.TextUtils.isEmpty;
@@ -31,6 +34,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static android.widget.Toast.LENGTH_SHORT;
 import static com.wpam.noheads.Util.getCurrentUserId;
+import static com.wpam.noheads.Util.savePushToken;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String LOG_TAG = "StartActivity";
@@ -41,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
     Button loginButton;
     EditText inputPassword;
     ProgressBar progressBar;
+    Context mContext;
 
 
     @Override
@@ -52,6 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         inputPassword = findViewById(R.id.input_password);
         loginButton = findViewById(R.id.login);
         progressBar = findViewById(R.id.progress);
+        mContext = this;
     }
 
 //    public void startSingleMode(View view) {
@@ -71,7 +77,17 @@ public class LoginActivity extends AppCompatActivity {
         } else {
 //            startActivity(new Intent(this, MainActivity.class)
 //                    .putExtra("type", "com.wpam.noheads.wifi"));
+            Log.d("LOGIN", "token: " + FirebaseInstanceId.getInstance().getToken());
+            Log.d(LOG_TAG, "Current user ID: " + getCurrentUserId());
+//            User user =  FirebaseDatabase.getInstance().getReference().child("users").child(getCurrentUserId());
 
+            String pushIDFirebase = FirebaseDatabase.getInstance().getReference().child("users").child(getCurrentUserId()).child("name").getKey();
+            Log.d(LOG_TAG, "pusId from db: " + pushIDFirebase);
+//            if (FirebaseInstanceId.getInstance().getToken()==null || FirebaseInstanceId.getInstance().getToken().isEmpty() ) {
+                String refreshedToken =  PreferenceManager.getDefaultSharedPreferences(mContext).getString("token","");
+                Log.d(LOG_TAG, "token from Preferences: " + refreshedToken);
+                savePushToken(refreshedToken, getCurrentUserId());
+      //      }
             startActivity(new Intent(this, UserListActivity.class));
         }
     }
@@ -112,9 +128,11 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseDatabase.getInstance().getReference().child("users").child(uid)
                                     .setValue(user);
 
-                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-                            savePushToken(refreshedToken, uid);
-
+//                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+//                            savePushToken(refreshedToken, uid);
+                            String refreshedToken =  PreferenceManager.getDefaultSharedPreferences(mContext).getString("token","");
+                            Log.d(LOG_TAG, "token from Preferences: " + refreshedToken);
+                            savePushToken(refreshedToken, getCurrentUserId());
 //                        startActivity(new Intent(this, MainActivity.class)
 //                                .putExtra("type", "com.wpam.noheads.wifi"));
 
@@ -122,21 +140,30 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else {
                             Log.d(LOG_TAG, "loginWithEmail: unsuccessful");
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                                    Toast.LENGTH_SHORT).show();
+//                            finish();
+//                            startActivity(getIntent());
                             auth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener(task1 -> {
                                         if (!isAnonymous()) {
-                                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-
+//                                            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+                                            String refreshedToken =  PreferenceManager.getDefaultSharedPreferences(mContext).getString("token","");
+                                            Log.d(LOG_TAG, "token from Preferences: " + refreshedToken);
                                             savePushToken(refreshedToken, getCurrentUserId());
 
 //                                        startActivity(new Intent(this, MainActivity.class)
 //                                                .putExtra("type", "com.wpam.noheads.wifi"));
 
                                             startActivity(new Intent(LoginActivity.this, UserListActivity.class));
-                                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                                    Toast.LENGTH_SHORT).show();
+//
+
 //                                       ToDO: update UI -> set to NULL (refresh!)
 
+                                        }
+                                        else{
+                                            Toast.makeText(mContext, "Wrong credentials!", Toast.LENGTH_LONG).show();
+                                            return;
                                         }
                                     });
                         }
@@ -147,8 +174,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void savePushToken(String refreshedToken, String uid) {
-    }
+//    private void savePushToken(String refreshedToken, String uid) {
+//    }
 
     private void showProgressDialog() {
         progressBar.setVisibility(VISIBLE);
