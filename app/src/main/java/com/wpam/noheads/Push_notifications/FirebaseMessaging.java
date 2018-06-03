@@ -16,8 +16,6 @@ import com.wpam.noheads.LoginActivity;
 import com.wpam.noheads.NewGameActivity;
 import com.wpam.noheads.R;
 
-
-import static android.support.v4.app.NotificationCompat.PRIORITY_HIGH;
 import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
 import static com.wpam.noheads.Util.getCurrentUserId;
 
@@ -44,7 +42,7 @@ public class FirebaseMessaging  extends FirebaseMessagingService {
         } else if (type.equals("accept")) {
             Intent newGameIntent = new Intent(getBaseContext(), NewGameActivity.class)
                     .putExtra("type", "wifi")
-                    .putExtra("me", "0")
+                    .putExtra("me", "1")
                     .putExtra("gameId", getCurrentUserId() + "-" + fromId)
                     .putExtra("withId", fromId);
             newGameIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
@@ -91,6 +89,7 @@ public class FirebaseMessaging  extends FirebaseMessagingService {
                     .putExtra("to", fromPushId);
             PendingIntent pendingIntentAccept = PendingIntent.getBroadcast(this, 2, acceptIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+//            wifi - starts new Game "session"
             Intent resultIntent = new Intent(this, NewGameActivity.class)
                     .putExtra("type", "wifi")
                     .putExtra("withId", fromId)

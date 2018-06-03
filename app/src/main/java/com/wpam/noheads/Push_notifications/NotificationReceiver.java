@@ -34,6 +34,7 @@ public class NotificationReceiver  extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(LOG_TAG, "onReceive: " + intent.getAction());
+
             FirebaseDatabase.getInstance().getReference().child("users")
                     .child(getCurrentUserId())
                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -73,17 +74,20 @@ public class NotificationReceiver  extends BroadcastReceiver {
                                 }
                             });
 
+//                            otrzymał accept od zaproszonej osoby
                             if (intent.getAction().equals("accept")) {
                                 String gameId = withId + "-" + getCurrentUserId();
                                 Time today = new Time(Time.getCurrentTimezone());
                                 today.setToNow();
                                 FirebaseDatabase.getInstance().getReference().child("games")
-                                        .child(gameId).child("restart")
-                                        .setValue(today.format("%k_%M_%S"));
+                                        .child(gameId).child("1")
+                                        .setValue(0);
+
+//                                        .setValue(today.format("%k_%M_%S"));
 
                                 Intent newGameIntent = new Intent(context, NewGameActivity.class)
                                         .putExtra("type", "wifi")
-                                        .putExtra("me", "1")
+                                        .putExtra("me", "0")
                                         .putExtra("gameId", gameId)
                                         .putExtra("withId", withId);
                                 newGameIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
