@@ -37,41 +37,38 @@
     <TextView
         android:id="@+id/textViewSongTitle"
         android:layout_width="match_parent"
-        android:layout_height="59dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_height="121dp"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="39dp"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="49dp"
-        android:autoSizeStepGranularity="2dp"
-        android:autoSizeTextType="uniform"
-        android:fontFamily="casual"
-        android:text="Song Title"
-        android:autoSizeMaxTextSize="59dp"
-        android:autoSizeMinTextSize="40dp"
-        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="6dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:maxLines="3"
+        android:minLines="2"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/logoColor"
         android:visibility="visible"
         tools:layout_editor_absoluteX="35dp"
-        tools:layout_editor_absoluteY="47dp"
-        tools:text="Song Title" />
+        tools:layout_editor_absoluteY="47dp" />
 
     <Button
         android:id="@+id/buttonTrue"
         android:layout_width="165dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignStart="@+id/buttonNext"
-        android:layout_marginBottom="205dp"
-        android:text="Right"
-        tools:layout_editor_absoluteX="188dp"
-        tools:layout_editor_absoluteY="264dp"
-        android:layout_alignLeft="@+id/buttonNext"
-        android:clickable = "false"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="211dp"
+        android:layout_marginEnd="31dp"
+        android:layout_marginRight="31dp"
+        android:clickable="false"
         android:fontFamily="casual"
-        android:textStyle="bold"
 
-        />
+        android:text="Right"
+        android:textStyle="bold"
+        android:visibility="visible"
+        tools:layout_editor_absoluteX="188dp"
+        tools:layout_editor_absoluteY="264dp" />
 
     <Button
         android:id="@+id/buttonFalse"
@@ -90,41 +87,17 @@
 
         />
 
-    <Button
-        android:id="@+id/buttonNext"
-        android:layout_width="171dp"
-        android:layout_height="48dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginEnd="19dp"
-        android:layout_marginRight="19dp"
-        android:layout_marginTop="190dp"
-        android:clickable="false"
-        android:fontFamily="casual"
-        android:text="Next"
-        android:textStyle="bold"
-        android:visibility="invisible"
-        tools:layout_editor_absoluteX="194dp"
-
-        tools:layout_editor_absoluteY="166dp" />
-
     <TextView
         android:id="@+id/textViewArtist"
         android:layout_width="match_parent"
-        android:layout_height="59dp"
-        android:layout_alignParentLeft="true"
+        android:layout_height="92dp"
+        android:layout_above="@+id/imageView2"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/textViewSongTitle"
-        android:layout_marginLeft="35dp"
-        android:layout_marginStart="35dp"
-        android:autoSizeTextType="uniform"
-        android:fontFamily="casual"
-        android:autoSizeMaxTextSize="59dp"
-        android:autoSizeMinTextSize="40dp"
-        android:autoSizeStepGranularity="2dp"
-        android:textStyle="bold"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/logoColor"
         android:visibility="visible"
-        tools:text="Random" />
+        android:layout_alignParentLeft="true" />
 
 </RelativeLayout>

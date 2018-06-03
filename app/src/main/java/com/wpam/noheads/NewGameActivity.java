@@ -1,5 +1,7 @@
 package com.wpam.noheads;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -47,9 +49,8 @@ public class NewGameActivity extends AppCompatActivity{
     Button buttonReset;
     Button buttonWrong;
     Button buttonRight;
-    Button buttonNext;
     String rival;
-    Map<String, String> artistsMap = new HashMap<String, String>(); // key = artist ID, value = Artist Name
+    Map<String, String> artistsMap = new HashMap<>(); // key = artist ID, value = Artist Name
     Map<String, ArrayList<String>> songsMap = new HashMap<>(); // key = artistID, songsMap = list of songs
 
 
@@ -58,17 +59,23 @@ public class NewGameActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+////        fetchSongs();
         mContext = this;
+
         setContentView(R.layout.activity_new_game);
         guessSongTV = findViewById(R.id.textViewSongTitle);
         guessArtistTV = findViewById(R.id.textViewArtist);
 
-        buttonNext = findViewById(R.id.buttonNext);
         buttonRight = findViewById(R.id.buttonTrue);
         buttonWrong = findViewById(R.id.buttonFalse);
         buttonReset = findViewById(R.id.buttonRestartGame);
         Bundle extras = getIntent().getExtras();
         String type = extras.getString("type");
+
+
+        Log.e(LOG_TAG, "Artists map length: " + artistsMap.size());
+        Log.e(LOG_TAG, "Songs map length: " + songsMap.size());
+
         Log.d(LOG_TAG, "game type: " + type);
         if (type.equals("wifi")) {
             withId = extras.getString("withId");
@@ -77,13 +84,12 @@ public class NewGameActivity extends AppCompatActivity{
             today.setToNow();
             Log.d(LOG_TAG, "me from extras: " + extras.get("me"));
             String me = extras.getString("me");
-            fetchArtists();
-            fetchSongs();
 
 
-            setGameId(gameId);
+//            setGameId(gameId);
             setMe(me);
             setWifiWith(withId);
+            fetchArtists(gameId);
 
             if (me.equals("1"))
             {
@@ -95,9 +101,6 @@ public class NewGameActivity extends AppCompatActivity{
             buttonWrong.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    FirebaseDatabase.getInstance().getReference().child("games")
-//                            .child(gameId).child("1")
-//                            .setValue(0);
                     FirebaseDatabase.getInstance().getReference().child("games")
                             .child(gameId).child(me)
                             .setValue(null);
@@ -123,7 +126,7 @@ public class NewGameActivity extends AppCompatActivity{
                 @Override
                 public void onClick(View view) {
                     FirebaseDatabase.getInstance().getReference().child("games")
-                            .child(gameId).setValue("restart");
+                            .child(gameId).setValue(null);
                     finish();
                 }
             });
@@ -131,6 +134,22 @@ public class NewGameActivity extends AppCompatActivity{
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        FirebaseDatabase.getInstance().getReference().child("games").child(gameId).setValue(null);
+
+    }
+
+
+
+    @Override
+    public void onResume(){
+        super.onResume();
+//        fetchArtists();
+//        fetchSongs();
+
+    }
 
 
     public void setWifiWith(String withId) {
@@ -138,6 +157,7 @@ public class NewGameActivity extends AppCompatActivity{
         otherUserId = withId;
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void setGameId(String gameId) {
         this.gameId = gameId;
         Log.d(LOG_TAG, "setGameId: " + gameId);
@@ -147,7 +167,8 @@ public class NewGameActivity extends AppCompatActivity{
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                         if (dataSnapshot.getValue() == null) {
-                            return;
+//                            return;
+                            finish();
                         }
                         String key = dataSnapshot.getKey();
                         Log.d(LOG_TAG, "data snapshot key: " + key);
@@ -167,7 +188,6 @@ public class NewGameActivity extends AppCompatActivity{
                             guessSongTV.setVisibility(View.VISIBLE);
                             guessArtistTV.setVisibility(View.VISIBLE);
 
-                            buttonNext.setClickable(true);
                             buttonReset.setClickable(true);
                             buttonRight.setClickable(true);
                             buttonWrong.setClickable(true);
@@ -176,7 +196,6 @@ public class NewGameActivity extends AppCompatActivity{
                         else if (!key.equals("restart") && !key.equals(me)){
                             guessSongTV.setVisibility(View.INVISIBLE);
                             guessArtistTV.setVisibility(View.INVISIBLE);
-                            buttonNext.setClickable(false);
                             buttonReset.setClickable(false);
                             buttonRight.setClickable(false);
                             buttonWrong.setClickable(false);
@@ -245,7 +264,8 @@ public class NewGameActivity extends AppCompatActivity{
         }
     }
 
-    private void fetchArtists() {
+//    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    private void fetchArtists(String gameId) {
         FirebaseDatabase.getInstance().getReference().child("artists")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -260,7 +280,7 @@ public class NewGameActivity extends AppCompatActivity{
                             }
                         }
                         Log.d(LOG_TAG, "fetch artists finished!");
-
+                        fetchSongs(gameId);
                     }
 
                     @Override
@@ -271,8 +291,8 @@ public class NewGameActivity extends AppCompatActivity{
     }
 
 
-
-    private void fetchSongs() {
+//    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+    private void fetchSongs(String gameId) {
         FirebaseDatabase.getInstance().getReference().child("songs")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -305,7 +325,7 @@ public class NewGameActivity extends AppCompatActivity{
                             }
                         }
                         Log.e(LOG_TAG, "fetch songs finished");
-
+                        setGameId(gameId);
                     }
 
                     @Override

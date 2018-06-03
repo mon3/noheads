@@ -39,7 +39,8 @@ public class AddSongActivity extends AppCompatActivity {
 
     Map<String, String> artistsMap = new HashMap<>();
     Map<String, ArrayList<String>> songsMap = new HashMap<>(); // key = artistID, songsMap = list of songs
-
+    private ChildEventListener databaseArtistsListener;
+    private ChildEventListener databaseSongsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,8 @@ public class AddSongActivity extends AppCompatActivity {
 //        artistsMap = (HashMap<String, String>)intent.getSerializableExtra("artistsData");
 //        songsMap = (Map<String, ArrayList<String>>)intent.getSerializableExtra("songsData");
 
-        databaseArtists.addChildEventListener(new ChildEventListener() {
+
+        databaseArtistsListener = databaseArtists.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Artist artist = dataSnapshot.getValue(Artist.class);
@@ -94,7 +96,7 @@ public class AddSongActivity extends AppCompatActivity {
             }
         });
 
-        databaseSongs.addChildEventListener(new ChildEventListener() {
+        databaseSongsListener = databaseSongs.addChildEventListener(new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -223,6 +225,15 @@ public class AddSongActivity extends AppCompatActivity {
         newSongRef.child(songId).setValue(song);
         Toast.makeText(mContext, "Song added to database", Toast.LENGTH_LONG).show();
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseArtists.removeEventListener(databaseArtistsListener);
+        databaseSongs.removeEventListener(databaseSongsListener);
+    }
+
 
 
 }
