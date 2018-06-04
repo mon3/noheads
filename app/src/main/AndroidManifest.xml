@@ -61,7 +61,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".StartGameActivity" />
         <activity android:name=".NewGameActivity" />
 
         <service android:name=".Push_notifications.FirebaseMessaging">

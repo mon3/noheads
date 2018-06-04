@@ -140,8 +140,8 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else {
                             Log.d(LOG_TAG, "loginWithEmail: unsuccessful");
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                                    Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+//                                                    Toast.LENGTH_SHORT).show();
 //                            finish();
 //                            startActivity(getIntent());
                             auth.signInWithEmailAndPassword(email, password)

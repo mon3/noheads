@@ -5,12 +5,14 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
@@ -53,13 +55,15 @@ public class NewGameActivity extends AppCompatActivity{
     Map<String, String> artistsMap = new HashMap<>(); // key = artist ID, value = Artist Name
     Map<String, ArrayList<String>> songsMap = new HashMap<>(); // key = artistID, songsMap = list of songs
 
+    ProgressBar timeLeftPrograssBar;
+    CountDownTimer countTimer;
+    int i=0;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-////        fetchSongs();
         mContext = this;
 
         setContentView(R.layout.activity_new_game);
@@ -69,10 +73,33 @@ public class NewGameActivity extends AppCompatActivity{
         buttonRight = findViewById(R.id.buttonTrue);
         buttonWrong = findViewById(R.id.buttonFalse);
         buttonReset = findViewById(R.id.buttonRestartGame);
+        timeLeftPrograssBar = findViewById(R.id.timeProgressBar);
         Bundle extras = getIntent().getExtras();
         String type = extras.getString("type");
 
+        // ToDO: change to 120000
+        countTimer=new CountDownTimer(30000,1000) {
 
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.v("Log_tag", "Tick of Progress"+ i+ millisUntilFinished);
+                i++;
+                timeLeftPrograssBar.setProgress((int)i*100/(30));
+            }
+
+            @Override
+            public void onFinish() {
+                i = 0;
+                countTimer.cancel();
+                timeLeftPrograssBar.setProgress(0);
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId).child(me)
+                        .setValue(null);
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId).child(rival)
+                        .setValue(0);
+            }
+        };
         Log.e(LOG_TAG, "Artists map length: " + artistsMap.size());
         Log.e(LOG_TAG, "Songs map length: " + songsMap.size());
 
@@ -85,8 +112,6 @@ public class NewGameActivity extends AppCompatActivity{
             Log.d(LOG_TAG, "me from extras: " + extras.get("me"));
             String me = extras.getString("me");
 
-
-//            setGameId(gameId);
             setMe(me);
             setWifiWith(withId);
             fetchArtists(gameId);
@@ -101,30 +126,25 @@ public class NewGameActivity extends AppCompatActivity{
             buttonWrong.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FirebaseDatabase.getInstance().getReference().child("games")
-                            .child(gameId).child(me)
-                            .setValue(null);
-                    FirebaseDatabase.getInstance().getReference().child("games")
-                            .child(gameId).child(rival)
-                            .setValue(0);
+                    timeLeftPrograssBar.setProgress(0);
+                    countTimer.onFinish();
+
                 }
             });
-
+// ToDO: zmienic TIMER!
             buttonRight.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    FirebaseDatabase.getInstance().getReference().child("games")
-                            .child(gameId).child(me)
-                            .setValue(null);
-                    FirebaseDatabase.getInstance().getReference().child("games")
-                            .child(gameId).child(rival)
-                            .setValue(0);
+                    timeLeftPrograssBar.setProgress(0);
+                    countTimer.onFinish();
                 }
             });
 
             buttonReset.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    i = 0;
+                    timeLeftPrograssBar.setProgress(0);
                     FirebaseDatabase.getInstance().getReference().child("games")
                             .child(gameId).setValue(null);
                     finish();
@@ -134,20 +154,56 @@ public class NewGameActivity extends AppCompatActivity{
         }
     }
 
+
     @Override
     public void onStop() {
         super.onStop();
+        i = 0;
+        if (countTimer!= null) {
+            countTimer.cancel();
+        }
+        timeLeftPrograssBar.setProgress(0);
         FirebaseDatabase.getInstance().getReference().child("games").child(gameId).setValue(null);
 
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (countTimer!= null) {
+            countTimer.cancel();
+        }
+
+
+    }
 
 
     @Override
     public void onResume(){
         super.onResume();
-//        fetchArtists();
-//        fetchSongs();
+        countTimer=new CountDownTimer(30000,1000) {
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.v("Log_tag", "Tick of Progress"+ i+ millisUntilFinished);
+                i++;
+                timeLeftPrograssBar.setProgress((int)i*100/(30));
+
+            }
+
+            @Override
+            public void onFinish() {
+                i = 0;
+                countTimer.cancel();
+                timeLeftPrograssBar.setProgress(0);
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId).child(me)
+                        .setValue(null);
+                FirebaseDatabase.getInstance().getReference().child("games")
+                        .child(gameId).child(rival)
+                        .setValue(0);
+            }
+        };
 
     }
 
@@ -191,7 +247,9 @@ public class NewGameActivity extends AppCompatActivity{
                             buttonReset.setClickable(true);
                             buttonRight.setClickable(true);
                             buttonWrong.setClickable(true);
-                            Log.d(LOG_TAG, "onChildAdded - count children: " + dataSnapshot.getChildrenCount());
+                            timeLeftPrograssBar.setProgress(0);
+                            timeLeftPrograssBar.setVisibility(View.VISIBLE);
+                            countTimer.start();
                         }
                         else if (!key.equals("restart") && !key.equals(me)){
                             guessSongTV.setVisibility(View.INVISIBLE);
@@ -199,6 +257,8 @@ public class NewGameActivity extends AppCompatActivity{
                             buttonReset.setClickable(false);
                             buttonRight.setClickable(false);
                             buttonWrong.setClickable(false);
+                            timeLeftPrograssBar.setProgress(0);
+                            timeLeftPrograssBar.setVisibility(View.INVISIBLE);
                         }
                         else if ( FirebaseDatabase.getInstance().getReference().child("games")
                                 .child(gameId).equals("restart")) {
@@ -215,18 +275,13 @@ public class NewGameActivity extends AppCompatActivity{
                         }
                         else {
                             Log.d(LOG_TAG, " on ChildChanged - count children: " + dataSnapshot.getChildrenCount());
-
                         }
-//                        if (dataSnapshot.getKey().equals("restart")) {
-//                            restart();
-//
-//                        }
+
                     }
 
                     @Override
                     public void onChildRemoved(DataSnapshot dataSnapshot) {
                         Log.d(LOG_TAG, "children number" + dataSnapshot.getChildrenCount());
-//                        finish();
                     }
 
                     @Override
@@ -241,19 +296,7 @@ public class NewGameActivity extends AppCompatActivity{
                 });
     }
 
-    private void restart() {
 
-        if (!isWIfi) {
-            isMyTurn = true;
-        } else {
-//            isMyTurn = MY_SHAPE == Constants.X;
-        }
-        done = false;
-//        ai = new AI(MY_SHAPE, AI_SHAPE, field);
-//        background.setImageResource(R.drawable.chalkboard2);
-//        background.setBackground(null);
-//        invalidate();
-    }
 
     public void setMe(String gotMe) {
         me = gotMe;
@@ -264,7 +307,6 @@ public class NewGameActivity extends AppCompatActivity{
         }
     }
 
-//    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void fetchArtists(String gameId) {
         FirebaseDatabase.getInstance().getReference().child("artists")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -276,7 +318,6 @@ public class NewGameActivity extends AppCompatActivity{
                             String artistId = artist.getArtistId();
                             if(!artistsMap.containsKey(artistName)){
                                 artistsMap.put(artistId, artistName);
-//                                Log.v(LOG_TAG, "fetchArtists " + artistName);
                             }
                         }
                         Log.d(LOG_TAG, "fetch artists finished!");
@@ -291,26 +332,19 @@ public class NewGameActivity extends AppCompatActivity{
     }
 
 
-//    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     private void fetchSongs(String gameId) {
         FirebaseDatabase.getInstance().getReference().child("songs")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-//                        String songArtistId = dataSnapshot.getKey();
-//                        Log.e("SONGS DB" ,"song artist ID: " + songArtistId);
-//                        Log.e("SONGS DB" ,"Artist's songs number: " + dataSnapshot.getChildrenCount());
-
                         for (DataSnapshot artistIDSnapshot: dataSnapshot.getChildren()) {
                             String songArtistId = artistIDSnapshot.getKey();
 
-//                            Log.e("SONGS DB", "ARTIST ID: " + songArtistId);
                             for (DataSnapshot songSnapshot : artistIDSnapshot.getChildren()) {
 
                                 Song song = songSnapshot.getValue(Song.class);
                                 String songTitle = song.getSongTitle();
-//                                Log.d("SONGS DB", "songTitle: " + songTitle);
 
                                 if (songsMap.containsKey(songArtistId)) {
                                     ArrayList<String> songsList = songsMap.get(songArtistId);
@@ -318,9 +352,7 @@ public class NewGameActivity extends AppCompatActivity{
                                 } else {
                                     ArrayList<String> songs = new ArrayList<>();
                                     songs.add(songTitle);
-//                                    Log.d(LOG_TAG, "artist Name in songs: " + artistsMap.get(songArtistId));
                                     songsMap.put(artistsMap.get(songArtistId), songs);
-//                                    Log.v("SONGS DB", "New song: " + songTitle);
                                 }
                             }
                         }

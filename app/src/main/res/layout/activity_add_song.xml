@@ -16,9 +16,11 @@
             android:layout_alignParentTop="true"
             android:ems="10"
             android:hint="@string/enter_artist"
+            android:fontFamily="casual"
             android:inputType="textPersonName"
             tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="1dp" />
+            tools:layout_editor_absoluteY="1dp"
+            android:backgroundTint="#5B2C6F"/>
 
         <Spinner
             android:id="@+id/spinnerLanguages"
@@ -29,6 +31,7 @@
             android:layout_below="@+id/editTextSong"
             android:layout_marginTop="12dp"
             android:entries="@array/languages"
+            android:fontFamily="casual"
             tools:layout_editor_absoluteX="0dp"
             tools:layout_editor_absoluteY="111dp" />
 
@@ -38,6 +41,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:textColor="@color/blackColor"
+            android:theme="@style/Start.Button"
             android:layout_below="@+id/spinnerLanguages"
             android:layout_marginTop="23dp"
             android:text="@string/add_song"
@@ -51,9 +57,20 @@
             android:layout_below="@+id/editTextName"
             android:layout_centerHorizontal="true"
             android:ems="10"
+            android:fontFamily="casual"
             android:hint="@string/enter_song"
             android:inputType="textPersonName"
             tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="47dp" />
+            tools:layout_editor_absoluteY="47dp"
+            android:backgroundTint="#5B2C6F"/>
 
-    </RelativeLayout>
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="353dp"
+        android:layout_height="239dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="31dp"
+        app:srcCompat="@drawable/guesssong" />
+
+</RelativeLayout>
